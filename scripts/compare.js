@@ -243,7 +243,7 @@ async function main()
         view.setColumns([0, 1, 2]);
         
         var options = {
-            title: "MAX SUBMISSIONS",
+            title: "MAX SUBMISSIONS FOR ONE PROBLEM",
             bar: { groupWidth: "50%" }, // Adjust bar width here (e.g., 30%, 40%)
             legend: { position: "none" },
             vAxis: { minValue: 0 },
@@ -285,7 +285,7 @@ async function main()
         view.setColumns([0, 1, 2]);
         
         var options = {
-            title: "MAX ACCEPTED",
+            title: "MAX ACCEPTED FOR ONE PROBLEM",
             bar: { groupWidth: "50%" }, // Adjust bar width here (e.g., 30%, 40%)
             legend: { position: "none" },
             vAxis: { minValue: 0 },
