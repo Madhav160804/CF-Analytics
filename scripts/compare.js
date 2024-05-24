@@ -47,8 +47,63 @@ async function main()
         worstRank2 = Math.max(worstRank2, json.result[i].rank);
     }
 
-    
-    
+    async function getData(handle) 
+    {
+        const accepted = new Set();
+        const tried = new Set();
+        const userURL = `https://codeforces.com/api/user.status?handle=${handle}`
+        const res = await axios.get(userURL);
+        const freq = {};
+        const acceptedFreq = {};
+        const obj = {};
+        obj.userHandle = handle;
+        let maxSubmissions = 0;
+        let maxAccepted = 0;
+        const data = res.data.result;
+        
+        for(const submission of data){
+            const problemId = `${submission.problem.contestId}-${submission.problem.index}`;
+            tried.add(problemId);
+            if(!freq[problemId])
+                freq[problemId] = 1;
+            else
+                freq[problemId]++;
+            maxSubmissions = Math.max(maxSubmissions, freq[problemId]);
+            if(submission.verdict === 'OK'){
+                accepted.add(problemId);
+                if(!acceptedFreq[problemId])
+                    acceptedFreq[problemId] = 1;
+                else
+                    acceptedFreq[problemId]++;
+                maxAccepted = Math.max(maxAccepted, acceptedFreq[problemId]);
+            }
+
+            
+        }
+        
+        obj.triedCount = tried.size;
+        obj.acceptedCount = accepted.size; 
+        obj.unsolvedCount = obj.triedCount - obj.acceptedCount;
+        obj.maxSubmissions = maxSubmissions;
+
+        let oneSubmission = 0;
+        for(const pId of accepted) {
+            if(freq[pId]==1)
+                oneSubmission++;
+        }
+
+        oneSubmission = (oneSubmission/obj.acceptedCount)*100;
+        obj.singleSubmissionAcceptedPercentage = oneSubmission;
+        obj.maxAcceptedCount = maxAccepted;
+        obj.averageSubmissions = data.length/obj.acceptedCount;
+
+        return obj;
+
+    }
+
+    const data1 = await getData(handle1);
+    const data2 = await getData(handle2);
+    console.log(data1,data2);
     google.charts.load('current', {'packages':['bar','corechart']});
     google.charts.setOnLoadCallback(drawCharts);
 
@@ -63,7 +118,7 @@ async function main()
         let options = {
             vAxis: { format: 'decimal' },
             chart: {
-            title: '        ',
+            title: 'RATING & MAX RATING',
             subtitle: '         ',
             },
         };
@@ -80,23 +135,27 @@ async function main()
         data.addColumn('string', 'User');
         data.addColumn('number', 'Contests');
         data.addRows([
-            [handle1, contestNum[0]],
-            [handle2, contestNum[1]],
+        [handle1, contestNum[0]],
+        [handle2, contestNum[1]],
         ]);
 
-        // Set chart options
+        // Set chart options with a ColumnChart for vertical bars
         let options = {
-            title: 'Number of Contests Participated In',
-            hAxis: {
+        title: 'Number of Contests Participated In',
+        hAxis: {
             title: 'User',
-            },
-            vAxis: {
+        },
+        vAxis: {
             title: 'Contests',
-            },
+            // Set minimum axis value to 0
+            minValue: 0,
+        },
+        // Use ColumnChart for vertical bars
+        chartType: 'ColumnChart',
         };
 
         // Load the Visualization library and draw the chart
-        let chart = new google.visualization.BarChart(document.getElementById('contests-num'));
+        let chart = new google.visualization.ColumnChart(document.getElementById('contests-num'));
         chart.draw(data, options);
 
     }
@@ -130,12 +189,144 @@ async function main()
         document.getElementById('best-h2').innerHTML = bestRank2;
     }
 
+    function unsolved() {
+        var data = google.visualization.arrayToDataTable([
+            ["Element", "Unsolved", { role: "style" }],
+            [handle1, data1.unsolvedCount, "green"],
+            [handle2 , data2.unsolvedCount, "blue"],
+          ]);
+          
+          var view = new google.visualization.DataView(data);
+          view.setColumns([0, 1, 2]);
+          
+          var options = {
+            title: "UNSOLVED",
+            bar: { groupWidth: "50%" }, // Adjust bar width here (e.g., 30%, 40%)
+            legend: { position: "none" },
+            vAxis: { minValue: 0 },
+          };
+          
+          var chart = new google.visualization.ColumnChart(document.getElementById("unsolved-chart"));
+          chart.draw(view, options);
+          
+    }
+
+    function averageSubmissions(){
+        var data = google.visualization.arrayToDataTable([
+            ["Element", "Average Submissions", { role: "style" }],
+            [handle1, data1.averageSubmissions, "green"],
+            [handle2 , data2.averageSubmissions, "blue"],
+        ]);
+        
+        var view = new google.visualization.DataView(data);
+        view.setColumns([0, 1, 2]);
+        
+        var options = {
+            title: "AVERAGE SUBMISSIONS",
+            bar: { groupWidth: "50%" }, // Adjust bar width here (e.g., 30%, 40%)
+            legend: { position: "none" },
+            vAxis: { minValue: 0 },
+        };
+        
+        var chart = new google.visualization.ColumnChart(document.getElementById("average-chart"));
+        chart.draw(view, options);
+    }
+    
+    function maxSubmissions(){
+        var data = google.visualization.arrayToDataTable([
+            ["Element", "Max Submissions", { role: "style" }],
+            [handle1, data1.maxSubmissions, "green"],
+            [handle2 , data2.maxSubmissions, "blue"],
+        ]);
+        
+        var view = new google.visualization.DataView(data);
+        view.setColumns([0, 1, 2]);
+        
+        var options = {
+            title: "MAX SUBMISSIONS",
+            bar: { groupWidth: "50%" }, // Adjust bar width here (e.g., 30%, 40%)
+            legend: { position: "none" },
+            vAxis: { minValue: 0 },
+        };
+        
+        var chart = new google.visualization.ColumnChart(document.getElementById("max-submissions"));
+        chart.draw(view, options);
+    }
+    
+    function solvedWithOneSubmission(){
+        var data = google.visualization.arrayToDataTable([
+            ["Element", "ONE SUBMISSION", { role: "style" }],
+            [handle1, data1.averageSubmissions, "green"],
+            [handle2 , data2.averageSubmissions, "blue"],
+        ]);
+        
+        var view = new google.visualization.DataView(data);
+        view.setColumns([0, 1, 2]);
+        
+        var options = {
+            title: "SOLVED WITH ONE SUBMISSIONS",
+            bar: { groupWidth: "50%" }, // Adjust bar width here (e.g., 30%, 40%)
+            legend: { position: "none" },
+            vAxis: { minValue: 0 },
+        };
+        
+        var chart = new google.visualization.ColumnChart(document.getElementById("one-chart"));
+        chart.draw(view, options);
+    }
+    
+    function maxAccepted(){
+        var data = google.visualization.arrayToDataTable([
+            ["Element", "Max Accepted", { role: "style" }],
+            [handle1, data1.maxAcceptedCount, "green"],
+            [handle2 , data2.maxAcceptedCount, "blue"],
+        ]);
+        
+        var view = new google.visualization.DataView(data);
+        view.setColumns([0, 1, 2]);
+        
+        var options = {
+            title: "MAX ACCEPTED",
+            bar: { groupWidth: "50%" }, // Adjust bar width here (e.g., 30%, 40%)
+            legend: { position: "none" },
+            vAxis: { minValue: 0 },
+        };
+        
+        var chart = new google.visualization.ColumnChart(document.getElementById("max-ac"));
+        chart.draw(view, options);
+    }
+    
+    function triedAndSolved(){
+        let data = google.visualization.arrayToDataTable([
+            ['',  handle1, handle2],
+            ['Tried', data1.triedCount, data2.triedCount],
+            ['Solved', data1.acceptedCount, data2.acceptedCount],
+        ]);
+
+        let options = {
+            vAxis: { format: 'decimal' },
+            chart: {
+            title: 'TRIED & SOLVED',
+            subtitle: '         ',
+            },
+        };
+
+        let chart = new google.charts.Bar(document.getElementById('triedAndSolved'));
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+  
+    }
+    
 
     function drawCharts(){
-       ratingComparison();
-       contestsNumber();
-       mxUp();
+        ratingComparison();
+        contestsNumber();
+        mxUp();
         bestTable();
+        unsolved();
+        averageSubmissions();
+        maxSubmissions();
+        solvedWithOneSubmission();
+        maxAccepted();
+        triedAndSolved();
     }
 
     

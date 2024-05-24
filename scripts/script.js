@@ -35,7 +35,19 @@ fetch(api_url)
           F: 0,
         };
         var total = 0;
+        const heatMapData = {};
         for (let submission of data.result) {
+          const date = new Date(submission.creationTimeSeconds * 1000);
+          const year = date.getFullYear();
+          const month = date.getMonth();
+          const day = date.getDate();
+          const submissionKey = `${year}-${month + 1}-${day}`;
+
+          if (new Date().getFullYear() - year < 2) {
+            if (!heatMapData[submissionKey]) {heatMapData[submissionKey] = 0;}
+            heatMapData[submissionKey]++;
+          }
+
           total = total+1;
 
       tried.add(submission.problem.contestId + '-' + submission.problem.index);
@@ -121,91 +133,87 @@ fetch(api_url)
           },
           options: {
             scales: {
-              yAxes: [{
-                ticks: {
-                  beginAtZero: true
-                }
-              }]
+              // yAxes: [{
+              //   ticks: {
+              //     beginAtZero: true
+              //   }
+              // }]
             }
           }
         });
 
-    //Tags of the user
+        //Tags of the user
 
-    let TagLabel = Object.keys(tags);
-    let TagData = Object.values(tags);
+        let TagLabel = Object.keys(tags);
+        let TagData = Object.values(tags);
 
-    let cty = document.getElementById('tag-chart').getContext('2d');
+        let cty = document.getElementById('tag-chart').getContext('2d');
 
-    let TagChart = new Chart(cty, {
-      type: 'doughnut',
-      data: {
-        labels: TagLabel,
-        datasets: [{
-          label: 'Problems Solved',
-          data: TagData,
+        let TagChart = new Chart(cty, {
+          type: 'doughnut',
+          data: {
+            labels: TagLabel,
+            datasets: [{
+              label: 'Problems Solved',
+              data: TagData,
 
-        }]
+            }]
+          },
+        });
 
+        //Language of the user
+        let LangLabel = Object.keys(language);
+        let LangData = Object.values(language);
 
-      },
-    });
+        let ctz = document.getElementById('lang-chart').getContext('2d');
 
-    //Language of the user
-    let LangLabel = Object.keys(language);
-    let LangData = Object.values(language);
+        let LangChart = new Chart(ctz, {
+          type: 'pie',
+          data: {
+            labels: LangLabel,
+            datasets: [{
+              data: LangData,
+              radius: '60%',
 
-    let ctz = document.getElementById('lang-chart').getContext('2d');
+            }]
+          },
+        });
 
-    let LangChart = new Chart(ctz, {
-      type: 'pie',
-      data: {
-        labels: LangLabel,
-        datasets: [{
-          data: LangData,
-          radius: '60%',
+        //Verdicts of the user
 
-        }]
+        let VerdictLabel = Object.keys(verdicts);
+        let VerdictData = Object.values(verdicts);
 
+        let ctty = document.getElementById('verdict-graph').getContext('2d');
 
-      },
-    });
+        let VerdChart = new Chart(ctty, {
+          type: 'pie',
+          data: {
+            labels: VerdictLabel,
+            datasets: [{
+              data: VerdictData,
+              radius: '64%',
+            }]
+          }
+        });
 
-    //Verdicts of the user
+        //Problem rating of user
 
-    let VerdictLabel = Object.keys(verdicts);
-    let VerdictData = Object.values(verdicts);
+        let RatingLabel = Object.keys(ratings);
+        let RatingData = Object.values(ratings);
 
-    let ctty = document.getElementById('verdict-graph').getContext('2d');
+        let ctte = document.getElementById('rating-graph').getContext('2d');
 
-    let VerdChart = new Chart(ctty, {
-      type: 'pie',
-      data: {
-        labels: VerdictLabel,
-        datasets: [{
-          data: VerdictData,
-          radius: '64%',
-        }]
-      }
-    });
-
-    //Problem rating of user
-
-    let RatingLabel = Object.keys(ratings);
-    let RatingData = Object.values(ratings);
-
-    let ctte = document.getElementById('rating-graph').getContext('2d');
-
-    let RatingChart = new Chart(ctte, {
-      type: 'bar',
-      data: {
-        labels: RatingLabel,
-        datasets: [{
-          data: RatingData,
-          label: 'Problems Solved',
-        }]
-      }
-    });
+        let RatingChart = new Chart(ctte, {
+          type: 'bar',
+          data: {
+            labels: RatingLabel,
+            datasets: [{
+              data: RatingData,
+              label: 'Problems Solved',
+            }]
+          }
+        });
 
         //question solved with one attempt
         let once = 0;
@@ -216,16 +224,35 @@ fetch(api_url)
         document.getElementById('once-value').textContent = once + '(' + ((once/accepted.size)*100).toFixed(2) + '%)';
 
 
-    const solved = accepted.size;
-    const countElement = document.getElementById('solved-value');
-    countElement.textContent = solved;
+        const solved = accepted.size;
+        const countElement = document.getElementById('solved-value');
+        countElement.textContent = solved;
 
-    const triednum = tried.size;
-    const ctelt = document.getElementById('tried-value');
-    ctelt.textContent = triednum;
+        const triednum = tried.size;
+        const ctelt = document.getElementById('tried-value');
+        ctelt.textContent = triednum;
 
-    const avnum = document.getElementById('average-value');
-    avnum.textContent = (total / solved).toFixed(2);
+        const avnum = document.getElementById('average-value');
+        avnum.textContent = (total / solved).toFixed(2);
+
+        // Render the heatmap
+        const rows = Object.keys(heatMapData).map(key => {
+          const [year, month, day] = key.split('-').map(Number);
+          return [new Date(year, month-1, day), heatMapData[key]];
+        });
+
+        var dataTable = new google.visualization.DataTable();
+        dataTable.addColumn({ type: 'date', id: 'Date' });
+        dataTable.addColumn({ type: 'number', id: 'Submissions' });
+        dataTable.addRows(rows);
+
+        const chart = new google.visualization.Calendar(document.getElementById('heatmap-element'));
+        const options = {
+          title: 'Codeforces Submissions Heatmap',
+          height: 350,
+        };
+
+        chart.draw(dataTable, options);
 
   })
   .catch(error => console.error(error));
