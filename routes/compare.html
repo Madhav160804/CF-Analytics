@@ -8,7 +8,7 @@ x<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="../styles">
+    <!-- <link rel="stylesheet" href="../styles/styles.css"> -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -205,29 +205,24 @@ x<!doctype html>
     </div> -->
 
     <div class=" container row mx-auto" style="height:400px; width:1400px;;">
-        <div class="col container my-4 mx-4 border shadow" style="background-color:white;">
-            <p>--</p>
+        <div class="col container my-4 mx-4 border shadow" id="triedAndSolved" style="background-color:white;">
         </div>
-        <div class="col container my-4 mx-4 border shadow" style="background-color:white;">
-            <p align="center">Unsolved</p>
+        <div class="col container my-4 mx-4 border shadow" id="unsolved-chart" style="background-color:white;">
+
         </div>
-        <div class="col container my-4 mx-4 border shadow" style="background-color:white;">
-            <p align="center">Average submission</p>
+        <div class="col container my-4 mx-4 border shadow" id="average-chart" style="background-color:white;">
         </div>
     </div>
     <div class=" container row mx-auto" style="height:400px; width:1400px;">
-        <div class="col container my-4 mx-4 border shadow" style="background-color:white;">
-            <p align="center">Max submission</p>
+        <div class="col container my-4 mx-4 border shadow" id="max-submissions" style="background-color:white;">
+
         </div>
-        <div class="col container my-4 mx-4 border shadow" style="background-color:white;">
-            <p align="center">Solved with one<br>
-                submission (%)</p>
+        <div class="col container my-4 mx-4 border shadow" id="one-chart" style="background-color:white;">
         </div>
-        <div class="col container my-4 mx-4 border shadow" style="background-color:white;">
-            <p align="center">Max AC</p>
+        <div class="col container my-4 mx-4 border shadow" id="max-ac" style="background-color:white;">
         </div>
     </div>
-    <div class="container border shadow mx-auto my-5" style="height:80px; width: 310px; background-color: white;">
+   <!-- <div class="container border shadow mx-auto my-5" style="height:80px; width: 310px; background-color: white;">
         <table class="table">
             <thead class="table-dark">
                 <tr>
@@ -241,7 +236,7 @@ x<!doctype html>
             </tbody>
         </table>
     </div>
-    <div class=" container row-featurette d-flex justify-content-center align-items-cneter border shadow mx-auto my-4"
+    <div class=" container row-featurette d-flex justify-content-center align-items-center border shadow mx-auto my-4"
         style="height:500px; width: 1100px; background-color: white;">
         <p align="center">
             <font size="5px">Levels</font>
@@ -276,7 +271,7 @@ x<!doctype html>
                 </tr>
             </tbody>
         </table>
-    </div>
+    </div> -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
