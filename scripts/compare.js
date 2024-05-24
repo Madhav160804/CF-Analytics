@@ -255,16 +255,16 @@ async function main()
     
     function solvedWithOneSubmission(){
         var data = google.visualization.arrayToDataTable([
-            ["Element", "ONE SUBMISSION", { role: "style" }],
-            [handle1, data1.averageSubmissions, "green"],
-            [handle2 , data2.averageSubmissions, "blue"],
+            ["Element", "PERCENTAGE", { role: "style" }],
+            [handle1,data1.singleSubmissionAcceptedPercentage, "green"],
+            [handle2 ,data2.singleSubmissionAcceptedPercentage, "blue"],
         ]);
         
         var view = new google.visualization.DataView(data);
         view.setColumns([0, 1, 2]);
         
         var options = {
-            title: "SOLVED WITH ONE SUBMISSIONS",
+            title: "SOLVED WITH ONE SUBMISSIONS(%)",
             bar: { groupWidth: "50%" }, // Adjust bar width here (e.g., 30%, 40%)
             legend: { position: "none" },
             vAxis: { minValue: 0 },
