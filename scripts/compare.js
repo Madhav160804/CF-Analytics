@@ -107,6 +107,40 @@ async function main()
     google.charts.load('current', {'packages':['bar','corechart']});
     google.charts.setOnLoadCallback(drawCharts);
 
+    // Fetch submissions data for user1 and user2
+    const submissions1 = await getSubmissions(handle1);
+    const submissions2 = await getSubmissions(handle2);
+
+    // Extract common questions attempted by both users
+    const commonQuestions = findCommonQuestions(submissions1, submissions2);
+
+    // Display common questions in the table
+    let tableBody = document.getElementById('common-questions');
+    // Display the count of common problems
+    document.getElementById('common-questions').textContent = commonQuestions.length;
+
+
+    // Function to fetch submissions data for a user
+    async function getSubmissions(handle) {
+        const userURL = `https://codeforces.com/api/user.status?handle=${handle}`;
+        const res = await axios.get(userURL);
+        return res.data.result;
+    }
+
+    // Function to find common questions between two sets of submissions
+    function findCommonQuestions(submissions1, submissions2) {
+        let commonQuestions = [];
+        for (let submission1 of submissions1) {
+            for (let submission2 of submissions2) {
+                if (submission1.problem.index === submission2.problem.index) {
+                    commonQuestions.push(submission1);
+                    break; // Exit the inner loop once a common question is found
+                }
+            }
+        }
+        return commonQuestions;
+    }
+
     function ratingComparison() {
 
         let data = google.visualization.arrayToDataTable([
@@ -314,6 +348,45 @@ async function main()
         chart.draw(data, google.charts.Bar.convertOptions(options));
   
     }
+
+    function drawTimeline() {
+        let data = google.visualization.arrayToDataTable([
+            ['Month', handle1, handle2],
+            [new Date(2022, 0), 500, 600],
+            [new Date(2022, 1), 450, 620],
+            [new Date(2022, 2), 500, 700],
+            [new Date(2022, 3), 520, 750],
+            [new Date(2022, 4), 500, 760],
+            [new Date(2022, 5), 480, 800],
+            [new Date(2022, 6), 470, 850],
+            [new Date(2022, 7), 460, 900],
+            [new Date(2022, 8), 450, 920],
+            [new Date(2022, 9), 460, 940],
+            [new Date(2022, 10), 480, 950],
+            [new Date(2022, 11), 500, 980],
+            [new Date(2023, 0), 520, 1000],
+            [new Date(2023, 1), 540, 1050],
+            [new Date(2023, 2), 550, 1100],
+            [new Date(2023, 3), 560, 1150],
+        ]);
+    
+        let options = {
+            title: 'Timeline',
+            hAxis: {
+                title: 'Month',
+                format: 'MMM yyyy',
+                gridlines: { count: 15 }
+            },
+            vAxis: {
+                title: 'Rating',
+                minValue: 0,
+            },
+            legend: { position: 'right' }
+        };
+    
+        let chart = new google.visualization.LineChart(document.getElementById('timeline'));
+        chart.draw(data, options);
+    }
     
 
     function drawCharts(){
@@ -327,6 +400,7 @@ async function main()
         solvedWithOneSubmission();
         maxAccepted();
         triedAndSolved();
+        drawTimeline();
     }
 
     
