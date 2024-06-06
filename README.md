@@ -27,3 +27,5 @@ This is code repository for a simple analytics visualization site for [Codeforce
 * Average and max attempts compared
 * Count of problems solved with one submission compared
 * Max AC for a single problem compared
+* Timeline
+* Common Questions
